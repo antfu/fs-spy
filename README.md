@@ -4,7 +4,6 @@
 
 Monitoring fs accessing for Node process
 
-
 ## Install
 
 ```bash
@@ -16,6 +15,8 @@ npm i -D fs-spy
 ```bash
 node -r fs-spy my-module.js
 ```
+
+<img width="517" alt="image" src="https://user-images.githubusercontent.com/11247099/164562714-005ffe5f-abfa-49e3-b1f8-fa3ad7ea45b7.png">
 
 ## Sponsors
 
