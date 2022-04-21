@@ -16,6 +16,13 @@ npm i -D fs-spy
 node -r fs-spy my-module.js
 ```
 
+For wrapped CLIs:
+
+```bash
+# NODE_OPTIONS=--require=fs-spy <command>
+NODE_OPTIONS=--require=fs-spy rollup -c
+```
+
 <img width="517" alt="image" src="https://user-images.githubusercontent.com/11247099/164562714-005ffe5f-abfa-49e3-b1f8-fa3ad7ea45b7.png">
 
 ## Sponsors
