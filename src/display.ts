@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { sep } from 'path'
 import { blue, bold, gray, green, inverse, magenta, yellow } from 'picocolors'
 
 export interface TreeNode<T> {
@@ -32,7 +33,7 @@ function pathListToTree<T>(data: [string, T][]): TreeNode<T>[] {
   const tree: TreeNode<T>[] = []
   for (let i = 0; i < data.length; i++) {
     const path: string = data[i][0]
-    const split: string[] = path.split('/')
+    const split: string[] = path.split(sep)
     createNode(split, tree, data[i][1])
   }
   return tree
@@ -72,7 +73,7 @@ function renderTreeNode(node: TreeNode<number>, indent = '', prefix = '├─', 
   if (node.children.length === 1) {
     return renderTreeNode({
       ...node.children[0],
-      name: `${node.name}/${node.children[0].name}`,
+      name: `${node.name}${sep}${node.children[0].name}`,
     }, indent, prefix, prevLast)
   }
   return [
