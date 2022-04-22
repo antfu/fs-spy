@@ -40,12 +40,6 @@ _internalFs.openFileHandle = function(...args: any[]) {
   return _openFileHandle(...args)
 }
 
-const _FileHandle = _internalFs.FileHandle
-_internalFs.FileHandle = function(...args: any[]) {
-  _onOpen(args[0])
-  return _FileHandle(...args)
-}
-
 const _listeners: OnFileOpenListener[] = []
 
 export type OnFileOpenListener = (path: string) => void
