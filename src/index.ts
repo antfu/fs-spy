@@ -40,7 +40,9 @@ function _onOpen(path: string) {
     return
   if (HIDE_NODE_MODULES && path.includes('node_modules'))
     return
-  const abs = resolve(process.cwd(), path)
+  // remove messy leading '\\' or '\\\\?\\' Universal Naming Convention (UNC) prefix in windows' file path
+  const normalizedPath = path.replace(/\\\\*\??\\+/, '')
+  const abs = resolve(process.cwd(), normalizedPath)
   _listeners.forEach(fn => fn(abs))
   console.log(openBadge, abs)
   counter.set(abs, (counter.get(abs) || 0) + 1)
