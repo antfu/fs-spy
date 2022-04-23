@@ -1,14 +1,12 @@
 /* eslint-disable no-console */
 import { sep } from 'path'
-import { blue, bold, gray, green, inverse, magenta, yellow } from 'picocolors'
+import { blue, bold, gray, green, inverse, magenta } from 'picocolors'
 
 export interface TreeNode<T> {
   name: string
   data?: T
   children: TreeNode<T>[]
 }
-
-export const openBadge = yellow('[fs.open]')
 
 function createNode<T>(path: string[], tree: TreeNode<T>[], data?: T): void {
   const name = path.shift()!

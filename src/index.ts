@@ -1,54 +1,49 @@
 import { resolve } from 'path'
 import { writeFileSync } from 'fs'
 import { partition } from '@antfu/utils'
-import { displayBadge, displayTree, openBadge } from './display'
+import { yellow } from 'picocolors'
+import { displayBadge, displayTree } from './display'
 
+// make them configurable by env
 const HIDE_NODE_MODULES = true
+const LOG = true
 
-/* eslint-disable no-console */
-// @ts-expect-error i know
-// eslint-disable-next-line n/no-deprecated-api
-const _internalFs = process.binding('fs')
+export const SupportedEvents = [
+  'open',
+  'openFileHandle',
+  'stat',
+  'lstat',
+  'access',
+] as const
 
-const _open = _internalFs.open
-_internalFs.open = function(...args: any[]) {
-  _onOpen(args[0])
-  return _open(...args)
+export type FileSystemEvent = typeof SupportedEvents[number]
+export type EventLog = [
+  event: FileSystemEvent,
+  filepath: string,
+  timestamp: number,
+]
+
+export const eventsLog: EventLog[] = []
+export const counter = new Map<string, number>()
+
+export function registerSpy() {
+  /* eslint-disable no-console */
+  // @ts-expect-error i know
+  // eslint-disable-next-line n/no-deprecated-api
+  const _internalFs = process.binding('fs')
+  SupportedEvents.forEach((event) => {
+    const _fn = _internalFs[event]
+    _internalFs[event] = function(...args: any[]) {
+      _onEvent(event, args[0])
+      return _fn(...args)
+    }
+  })
 }
 
-const _access = _internalFs.access
-_internalFs.access = function(...args: any[]) {
-  _onOpen(args[0])
-  return _access(...args)
-}
+const _listeners: OnFileEventListener[] = []
 
-const _stat = _internalFs.stat
-_internalFs.stat = function(...args: any[]) {
-  _onOpen(args[0])
-  return _stat(...args)
-}
-
-const _lstat = _internalFs.lstat
-_internalFs.lstat = function(...args: any[]) {
-  _onOpen(args[0])
-  return _lstat(...args)
-}
-
-const _openFileHandle = _internalFs.openFileHandle
-_internalFs.openFileHandle = function(...args: any[]) {
-  _onOpen(args[0])
-  return _openFileHandle(...args)
-}
-const _access = _internalFs.access
-_internalFs.access = function(...args: any[]) {
-  _onOpen(args[0])
-  return _access(...args)
-}
-
-const _listeners: OnFileOpenListener[] = []
-
-export type OnFileOpenListener = (path: string) => void
-export function onFileOpen(fn: OnFileOpenListener) {
+export type OnFileEventListener = (...e: EventLog) => void
+export function onFileEvent(fn: OnFileEventListener) {
   _listeners.push(fn)
   return () => {
     const i = _listeners.indexOf(fn)
@@ -57,28 +52,38 @@ export function onFileOpen(fn: OnFileOpenListener) {
   }
 }
 
-export const counter = new Map<string, number>()
-
-function _onOpen(path: string) {
+function _onEvent(event: FileSystemEvent, path: string) {
   if (typeof path !== 'string')
     return
   if (HIDE_NODE_MODULES && path.includes('node_modules'))
     return
-  // remove messy leading '\\' or '\\\\?\\' Universal Naming Convention (UNC) prefix in windows' file path
+    // remove messy leading '\\' or '\\\\?\\' Universal Naming Convention (UNC) prefix in windows' file path
   const normalizedPath = path.replace(/\\\\*\??\\+/, '')
   const abs = resolve(process.cwd(), normalizedPath)
-  _listeners.forEach(fn => fn(abs))
-  console.log(openBadge, abs)
+  const log: EventLog = [event, abs, Date.now()]
+  eventsLog.push(log)
+  _listeners.forEach(fn => fn(...log))
+  if (LOG)
+    console.log(yellow(`[fs.${event}]`), abs)
   counter.set(abs, (counter.get(abs) || 0) + 1)
 }
 
-process.on('beforeExit', () => {
+export function writeLog(path = '.fs-spy.json') {
+  writeFileSync(path, JSON.stringify(eventsLog, null, 2))
+}
+
+export function printCountTree() {
   const entries = [...counter.entries()].sort((a, b) => a[0].localeCompare(b[0]))
-  writeFileSync('.fs-spy.json', JSON.stringify(Object.fromEntries(entries), null, 2))
   const cwd = process.cwd()
   const [relative, absolute] = partition(entries, i => i[0].startsWith(cwd))
 
   displayBadge()
   displayTree(absolute, '', '/')
   displayTree(relative, cwd, cwd)
+}
+
+registerSpy()
+process.on('beforeExit', () => {
+  writeLog()
+  printCountTree()
 })
