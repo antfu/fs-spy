@@ -15,6 +15,25 @@ _internalFs.open = function(...args: any[]) {
   _onOpen(args[0])
   return _open(...args)
 }
+
+const _access = _internalFs.access
+_internalFs.access = function(...args: any[]) {
+  _onOpen(args[0])
+  return _access(...args)
+}
+
+const _stat = _internalFs.stat
+_internalFs.stat = function(...args: any[]) {
+  _onOpen(args[0])
+  return _stat(...args)
+}
+
+const _lstat = _internalFs.lstat
+_internalFs.lstat = function(...args: any[]) {
+  _onOpen(args[0])
+  return _lstat(...args)
+}
+
 const _openFileHandle = _internalFs.openFileHandle
 _internalFs.openFileHandle = function(...args: any[]) {
   _onOpen(args[0])
