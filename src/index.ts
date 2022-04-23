@@ -39,6 +39,11 @@ _internalFs.openFileHandle = function(...args: any[]) {
   _onOpen(args[0])
   return _openFileHandle(...args)
 }
+const _access = _internalFs.access
+_internalFs.access = function(...args: any[]) {
+  _onOpen(args[0])
+  return _access(...args)
+}
 
 const _listeners: OnFileOpenListener[] = []
 
