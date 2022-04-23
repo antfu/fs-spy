@@ -23,7 +23,20 @@ For wrapped CLIs:
 NODE_OPTIONS=--require=fs-spy rollup -c
 ```
 
-<img width="517" alt="image" src="https://user-images.githubusercontent.com/11247099/164562714-005ffe5f-abfa-49e3-b1f8-fa3ad7ea45b7.png">
+<img width="495" alt="image" src="https://user-images.githubusercontent.com/11247099/164841468-c805fcc0-0cc5-4724-8d38-7c2d8866ea1d.png">
+
+## Debugging
+
+You can use `fs-spy` to debug why certain file has be accessed by using the hook. For example
+
+```ts
+import spy from 'fs-spy'
+
+spy.onFileEvent((event, filepath) => {
+  if (filepath.endsWith('.json'))
+    throw new Error('See the stack trace')
+})
+```
 
 ## Sponsors
 
