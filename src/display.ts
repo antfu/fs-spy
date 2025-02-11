@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { sep } from 'path'
-import { blue, bold, gray, green, inverse, magenta } from 'picocolors'
+import { blue, gray, green, magenta } from 'ansis'
 
 export interface TreeNode<T> {
   name: string
@@ -39,7 +39,7 @@ function pathListToTree<T>(data: [string, T][]): TreeNode<T>[] {
 
 export function displayBadge() {
   console.log()
-  console.log(inverse(bold(magenta(' FSSPY '))) + magenta(' Summary'))
+  console.log(magenta.bold.inverse(' FSSPY ') + magenta(' Summary'))
 }
 
 export function displayTree(entries: [string, number][], root = '', message = '') {
@@ -75,7 +75,7 @@ function renderTreeNode(node: TreeNode<number>, indent = '', prefix = '├─', 
     }, indent, prefix, prevLast)
   }
   return [
-    (node.name ? `${gray(`${indent}${prefix} `)}${node.name}` : '') + (node.data ? green(` x${node.data}`) : ''),
+    (node.name ? `${gray`${indent}${prefix} `}${node.name}` : '') + (node.data ? green` x${node.data}` : ''),
     ...renderTreeNodes(node.children, indent, prevLast),
   ]
 }

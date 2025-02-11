@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { writeFileSync } from 'fs'
 import { partition } from '@antfu/utils'
-import { yellow } from 'picocolors'
+import { yellow } from 'ansis'
 import { displayBadge, displayTree } from './display'
 
 // make them configurable by env
@@ -64,7 +64,7 @@ function _onEvent(event: FileSystemEvent, path: string) {
   eventsLog.push(log)
   _listeners.forEach(fn => fn(...log))
   if (LOG)
-    console.log(yellow(`[fs.${event}]`), abs)
+    console.log(yellow`[fs.${event}]`, abs)
   counter.set(abs, (counter.get(abs) || 0) + 1)
 }
 
